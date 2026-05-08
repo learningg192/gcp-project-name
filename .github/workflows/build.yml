@@ -1,0 +1,44 @@
+name: CI-CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  PROJECT_ID: ams-kap
+  REGION: us-central1
+  REPO: emp-app-repo
+  IMAGE: emp-app
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/504125230577/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: github-actions-sa@ams-kap.iam.gserviceaccount.com
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+
+      - name: Build Docker Image
+        run: |
+          docker build -t us-central1-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:latest ./emp-app
+
+      - name: Push Docker Image
+        run: |
+          docker push us-central1-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:latest
