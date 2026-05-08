@@ -32,10 +32,7 @@ function loadData() {
 
       data.forEach(row => {
         const li = document.createElement("li");
-
-        // UPDATED: displaying id also in UI
-        li.innerText = `${row.id} - ${row.name} - ${row.city}`;
-
+        li.innerText = `${row.name} - ${row.city}`;
         list.appendChild(li);
       });
     })

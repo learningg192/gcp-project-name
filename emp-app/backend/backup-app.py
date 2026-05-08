@@ -33,22 +33,11 @@ def get_data():
     conn = get_conn()
     cur = conn.cursor()
     try:
-
-        # UPDATED: selecting id also from database
-        cur.execute("SELECT id, name, city FROM team_tble ORDER BY id")
-
+        cur.execute("SELECT name, city FROM team_tble")
         rows = cur.fetchall()
-
-        # UPDATED: returning id, name, city in JSON response
         return jsonify([
-            {
-                "id": r[0],
-                "name": r[1],
-                "city": r[2]
-            }
-            for r in rows
+            {"name": r[0], "city": r[1]} for r in rows
         ])
-
     except Exception as e:
         conn.rollback()
         return jsonify({"error": str(e)})
